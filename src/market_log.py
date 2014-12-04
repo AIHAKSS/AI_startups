@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#coding: utf-8
 
 import MySQLdb
 import requests
@@ -29,9 +30,11 @@ def download_season_prices(stock_no, from_date_str, to_date_str):
             row = []
             for v2 in v.select('div'):
                 row.append( v2.text.strip().encode('utf-8') )
+            #日期 开盘价 最高价 收盘价 最低价 交易量(股) 交易金额(元)
             if len(row) == 7 and row[-1].isdigit():
-                row[0] = row[0].replace('-','')
-                rows.append(row)
+                #`date`, `open`, `close`, `high`, `low`, `volume`, `turnover`
+                row2 = [row[0], row[1], row[3], row[2], row[4], row[5], row[6]]
+                rows.append(row2)
     return rows
 
 def insert_daily_prices(stock_no, rows):
@@ -41,7 +44,7 @@ def insert_daily_prices(stock_no, rows):
         for row in rows:
             sql = "REPLACE INTO xkx.tb_marketlog(`stockno`, `date`, `open`, `close`, `high`, `low`, `volume`, `turnover`) \
                     VALUES ('%s', %s, '%s',  '%s', '%s', '%s', '%s', '%s') \
-                    ;" % (stock_no, row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                    ;" % (stock_no, row[0].replace('-',''), row[1], row[2], row[3], row[4], row[5], row[6])
             cursor_.execute(sql)
             db_.commit()
         cursor_.close()
@@ -51,17 +54,18 @@ def insert_daily_prices(stock_no, rows):
 
 def get_daily_prices(stock_no, from_date_str, to_date_str):
     #`date`, `open`, `close`, `high`, `low`, `volume`, `turnover`
+    print 'get_daily_prices', stock_no, from_date_str, to_date_str
 
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
     cursor_ = db_.cursor()
-    sql = "SELECT `date`, `open`, `close`, `high`, `low`, `volume`, `turnover` FROM xkx.tb_marketlog where stockno='%s' and date>='%s' and date<='%s';" % (stock_no, from_date_str.replace('-',''), to_date_str.replace('-',''))
+    sql = "SELECT `date`, `open`, `close`, `high`, `low`, `volume`, `turnover` FROM xkx.tb_marketlog where stockno='%s' and date>='%s' and date<='%s' order by date desc;" % (stock_no, from_date_str.replace('-',''), to_date_str.replace('-',''))
     rows = []
     max_date = 0
     try:
         cursor_.execute(sql)
         results = cursor_.fetchall()
         for row in results:
-            rows.append(row)     
+            rows.append(list(row))     
             max_date = max(int(row[0]), max_date) 
         cursor_.close()
         db_.close()

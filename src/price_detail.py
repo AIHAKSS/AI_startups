@@ -65,20 +65,26 @@ def get_price_details(stock_no, date_str):
         insert_price_details(stock_no, date_str, rows)
         return rows
 
-def get_up_down_volume(stock_no, date_str, open_price):
-    #up_volume, down_volume
+def get_up_down(stock_no, date_str, open_price):
+    #up_volume, up_turnover, down_volume, down_turnover
 
     details = get_price_details(stock_no, date_str)
     up_volume, down_volume = 0, 0
+    up_turnover, down_turnover = 0, 0
     for price, volume in details: 
-        if price > open_price: up_volume += volume
-        elif price < open_price: down_volume += volume
-    return up_volume, down_volume
+        price, volume = float(price), int(volume)
+        if price > open_price: 
+            up_volume += volume
+            up_turnover += volume * price
+        elif price < open_price: 
+            down_volume += volume
+            down_turnover += volume * price
+    return up_volume, up_turnover, down_volume, down_turnover
     
 
 def test():
     print get_price_details('600000', '2014-11-14')
-    print  get_up_down_volume('600000', '2014-11-14', 10.88)
+    print get_up_down('600000', '2014-11-14', 10.88)
 
 
 if __name__ == '__main__':

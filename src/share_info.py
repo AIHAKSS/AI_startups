@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def download_share_info(stock_no, date_str, last_days):
-    pass
+    return ''
 
 def insert_share_info(stock_no, rows):
     pass
@@ -16,20 +16,23 @@ def get_shares(stock_no, date_str):
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
     cursor_ = db_.cursor()
     sql = "SELECT ashares FROM xkx.tb_structinfo where stockno='%s' and date<='%s' order by date desc limit 1;" % (stock_no, date_str)
-    rows = []
+    row = []
     try:
         cursor_.execute(sql)
-        results = cursor_.fetchall()
-        for row in results:
-            rows.append(row)
+        rows = cursor_.fetchall()
+        for r in rows:
+            row = r
+            break
         cursor_.close()
+        db_.close()
     except Exception, e:
         print repr(e)
-    if rows:
-        return rows[0]
+    if row:
+        return row[0]
     else:
-        rows = download_share_info(stock_no, date_str, last_days):
-        insert_share_info(stock_no, rows)
+        row = download_share_info(stock_no, date_str, last_days)
+        if row:
+            insert_share_info(stock_no, row)
     return 0 
 
 
