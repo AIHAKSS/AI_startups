@@ -43,6 +43,8 @@ def insert_price_details(stock_no, date_str, rows):
         print repr(e)
 
 def get_price_details(stock_no, date_str):
+    #`price`, `volume`
+
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
     cursor_ = db_.cursor()
     sql = "SELECT `price`, `volume` FROM xkx.tb_pricedetail where stockno='%s' and date='%s';" % (stock_no, date_str.replace('-',''))
@@ -64,6 +66,8 @@ def get_price_details(stock_no, date_str):
         return rows
 
 def get_up_down_volume(stock_no, date_str, open_price):
+    #up_volume, down_volume
+
     details = get_price_details(stock_no, date_str)
     up_volume, down_volume = 0, 0
     for price, volume in details: 
@@ -71,6 +75,7 @@ def get_up_down_volume(stock_no, date_str, open_price):
         elif price < open_price: down_volume += volume
     return up_volume, down_volume
     
+
 def test():
     print get_price_details('600000', '2014-11-14')
     print  get_up_down_volume('600000', '2014-11-14', 10.88)

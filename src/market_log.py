@@ -3,11 +3,12 @@
 import MySQLdb
 import requests
 from bs4 import BeautifulSoup
+import my_util
 
 def download_season_prices(stock_no, from_date_str, to_date_str):
+    start_year, start_season = my_util.depack_date_str(from_date_str)[:2]
+    to_year, to_season = my_util.depack_date_str(to_date_str)[:2]
     urls = []
-    arr1, arr2 = from_date_str.split('-'), to_date_str.split('-')
-    start_year, start_season, to_year, to_season = int(arr1[0]), (int(arr1[1])-1)/3+1, int(arr2[0]), (int(arr2[1])-1)/3+1
     i = 0
     while True:
         year, season = start_year + (start_season+i-1)/4, (start_season+i-1)%4+1
@@ -49,6 +50,8 @@ def insert_daily_prices(stock_no, rows):
         print repr(e)
 
 def get_daily_prices(stock_no, from_date_str, to_date_str):
+    #`date`, `open`, `close`, `high`, `low`, `volume`, `turnover`
+
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
     cursor_ = db_.cursor()
     sql = "SELECT `date`, `open`, `close`, `high`, `low`, `volume`, `turnover` FROM xkx.tb_marketlog where stockno='%s' and date>='%s' and date<='%s';" % (stock_no, from_date_str.replace('-',''), to_date_str.replace('-',''))
@@ -71,6 +74,7 @@ def get_daily_prices(stock_no, from_date_str, to_date_str):
         insert_daily_prices(stock_no, rows)
         return rows
     
+
 def test():
     print get_daily_prices('600000', '2014-09-12', '2014-11-14')
 
