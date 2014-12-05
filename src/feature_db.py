@@ -1,14 +1,34 @@
 #!/usr/bin/python
 
 import MySQLdb
+import math
 import json
 from share_info import get_shares
 from market_log import get_daily_prices
 from price_detail import get_up_down
 import my_util
 
-period_days = 30
-oldest_date = 20141001
+avg_period_days = 30
+avg_oldest_date = 20141001
+variable_period = 30
+
+def calc_period_variable(stock_no, date_str, period=variable_period):
+    history_list = []
+    for i in range(0, period):
+        ds = my_util.date_delta(date_str, -i)
+        if my_util.date_to_int(ds) < avg_oldest_date: 
+            break
+        history = get_day_features(stock_no, ds)
+        if history:
+            history_list.append(history)
+    if not history_list:
+        return []
+    variables_list = []
+    for i in range(len(history_list[0])):
+        v_list = [history[i] for history in history_list]
+        variables_list.append( (max(v_list), min(v_list), sum(v_list)/len(v_list)) )
+    return variables_list
+
 
 def insert_day_features(stock_no, date_str, row):
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
@@ -23,7 +43,29 @@ def insert_day_features(stock_no, date_str, row):
     except Exception, e:
         print repr(e)
 
-def get_day_features(stock_no, date_str):
+def get_next_features(stock_no, date_str):
+    db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
+    cursor_ = db_.cursor()
+    sql = "SELECT `features` FROM xkx.tb_midvalue where stockno='%s' and date>'%s' order by date limit 1;" % (stock_no, date_str.replace('-',''))
+    row = []
+    try:
+        cursor_.execute(sql)
+        ret = cursor_.fetchone()
+        if ret:
+            row = json.loads(ret[0])
+        cursor_.close()
+        db_.close()
+    except Exception, e:
+        print repr(e)
+    return row
+
+def get_day_features(stock_no, date_str, update=False):
+    if update:
+        row = calc_day_features(stock_no, date_str, avg_period_days)
+        if row:
+            insert_day_features(stock_no, date_str, row)
+        return row
+
     db_ = MySQLdb.connect(host="localhost", port=3306, user="xkx", passwd="xkx", db="xkx")
     cursor_ = db_.cursor()
     sql = "SELECT `features` FROM xkx.tb_midvalue where stockno='%s' and date='%s';" % (stock_no, date_str.replace('-',''))
@@ -38,13 +80,16 @@ def get_day_features(stock_no, date_str):
     except Exception, e:
         print repr(e)
     if not row:
-        row = calc_day_features(stock_no, date_str, period_days)
+        row2 = get_next_features(stock_no, date_str)
+        if row2: 
+            return []
+        row = calc_day_features(stock_no, date_str, avg_period_days)
         if row:
             insert_day_features(stock_no, date_str, row)
     return row
 
-def calc_day_features(stock_no, date_str, past=period_days):
-    print 'calc_day_features', stock_no, date_str, period_days
+def calc_day_features(stock_no, date_str, past=avg_period_days):
+    print 'calc_day_features', stock_no, date_str, avg_period_days
     ashare = int(get_shares(stock_no, date_str))
     if not ashare:
         return []
@@ -61,7 +106,7 @@ def calc_day_features(stock_no, date_str, past=period_days):
     history_list = []
     for i in range(1, past+1):
         ds = my_util.date_delta(date_str, -i)
-        if my_util.date_to_int(ds) < oldest_date: 
+        if my_util.date_to_int(ds) < avg_oldest_date: 
             break
         history = get_day_features(stock_no, ds)
         if history:
@@ -115,11 +160,11 @@ def calc_day_features(stock_no, date_str, past=period_days):
     features.append( down_rate ) 
     #elif arg_name == '17': # up_rate / average_up_rate
     avg_upr = sum([float(v[14]) for v in history_list if v[14] > 0]) / sum([1 for v in history_list if v[14] > 0] + [0.1])
-    if up_rate > 0 and avg_upr > 0: features.append( up_rate / avg_upr )
+    if avg_upr > 0: features.append( up_rate / avg_upr )
     else: features.append( 1 )
     #elif arg_name == '18': # down_rate / average_down_rate 
     avg_downr = sum([float(v[15]) for v in history_list if v[15] > 0]) / sum([1 for v in history_list if v[15] > 0] + [0.1])
-    if down_rate > 0 and avg_downr > 0: features.append( down_rate / avg_downr )
+    if avg_downr > 0: features.append( down_rate / avg_downr )
     else: features.append( 1 )
     #elif arg_name == '19': # up_amp_rate = (high - open) / open;
     up_amp_rate = (v_high - v_open) / v_open
@@ -144,12 +189,16 @@ def calc_day_features(stock_no, date_str, past=period_days):
     B = avg_turnover / (ashare * avg_close)
     features.append( A / B ) 
 
+    features = [math.fabs(v) for v in features]
     return features
 
 
 def test():
     print get_day_features('600000', '2014-11-12')
+    print get_next_features('600000', '2014-11-12')
+    print get_next_features('600000', '2014-10-12')
 
+    print calc_period_variable('600000', '2014-11-12')
 
 if __name__ == '__main__':
     test()
