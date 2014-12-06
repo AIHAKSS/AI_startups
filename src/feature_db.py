@@ -194,11 +194,11 @@ def calc_day_features(stock_no, date_str, past=avg_period_days):
 
 
 def test():
-    print get_day_features('600000', '2014-11-12')
-    print get_next_features('600000', '2014-11-12')
+    print get_day_features('600000', '2014-12-05')
+    print get_next_features('600000', '2014-12-05')
     print get_next_features('600000', '2014-10-12')
 
-    print calc_period_variable('600000', '2014-11-12')
+    print calc_period_variable('600000', '2014-12-05')
 
 if __name__ == '__main__':
     test()
