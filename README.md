@@ -33,9 +33,9 @@
 ## AI Branches of Big Companies 
 * MS Research -- Cortana, Face, Translator
 * FB AI Lab -- memory network, text understanding, chat bot
+* Baidu IDL -- Speech, Image, Vehicle automation
+* IBM Watson -- Knowledge graph, QA 
 * Tencent youtu -- Image
-* Baidu IDL -- Vehicle automation
-* IBM Watson -- 
 * Amazon --
 * Apple -- 
 * Nvidia -- 
