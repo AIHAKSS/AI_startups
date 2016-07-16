@@ -1,9 +1,9 @@
 
 ## AI outside of China：
 * DeepMind (Acquired by Google) -- RL, DQN, transfer learning; AlphaGO, Health;
-* MetaMind (Acquired by Salesforce) -- Muti-task learning, dynamic memory network
-* Numenta -- Neocortex, Biological learning
-* Geometric Intelligence -- one shot learning
+* MetaMind (Acquired by Salesforce) -- Muti-task learning, dynamic memory network;
+* Numenta -- Neocortex, Biological learning; Anomaly detection
+* Geometric Intelligence -- Fast deep learning;
 * MobileEye -- Vehicle automation 
 * wit.ai (Acquired by Facebook) -- Chat bot platform
 * Visionlabs -- Face
@@ -15,25 +15,25 @@
 ## AI in China：
 * XunFei (iflytec) -- Speech
 * 4Paradigm -- Transfer learning, AI platform
-* Face++ -- face, image
+* Face++ -- Face, Image
 * Horizon-Robotics -- DPU
 * SenseTime -- CV
 * YituTech -- CV
 * Deepglint -- Security
-* Peak-labs -- semantic search, text understanding
+* Peak-labs -- Semantic search, Text understanding
 * TupuTech -- Image, Video
 * TuSimple -- Image
 * ReadSense -- Face, Hand 
 * Aiiage -- Robots
 * EmotiBot -- Emotional Bot
 * Deephi -- DPU
-* Howareyou-robot -- chat robot
+* Howareyou-robot -- Chat bot, Child care
 * Faceall -- Face
 
 ## AI Branches of Big Companies 
 * Google -- Brain, Hinton, TensorFlow, Google Now
 * MS Research -- Cortana, Face, Translation
-* FB AI Lab -- memory network, text understanding, chat bot
+* FB AI Lab -- Memory network; Text understanding, Chat bot
 * Baidu IDL -- Speech, Image, Vehicle automation
 * IBM Watson -- Knowledge graph, QA 
 * Tencent youtu -- Image
