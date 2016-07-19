@@ -11,6 +11,7 @@
 * Alpaca.ai -- Quantitative analysis 
 * Flatiron -- Cancer
 * Enlitic -- Medicine
+* ZestFinance -- Finance Risk
 
 ## AI in China：
 * XunFei (iflytec) -- Speech
@@ -28,6 +29,7 @@
 * EmotiBot -- Emotional Bot
 * Deephi -- DPU
 * Howareyou-robot -- Chat bot, Child care
+* CreditX -- Finance risk
 * Faceall -- Face
 
 ## AI Branches of Big Companies 
